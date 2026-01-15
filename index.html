@@ -212,7 +212,7 @@
             }
             
             #labels-container {
-                bottom: 100px; gap: 10px;
+                bottom: 85px; gap: 8px;
             }
             
             .card-label-box {
@@ -322,7 +322,7 @@
             }
             
             #labels-container {
-                bottom: 90px; gap: 8px;
+                bottom: 78px; gap: 6px;
             }
             
             .card-label-box {
@@ -1234,7 +1234,24 @@
         shuffleTimer = setInterval(() => { progress += 2; progressBar.style.width = progress + '%'; cards.forEach(c => { c.position.y = (Math.random()-0.5)*0.5; c.rotation.z = (Math.random()-0.5)*0.2; }); if (progress >= 100) { finishShuffling(); } }, 50);
     }
     function finishShuffling() { clearInterval(shuffleTimer); clearInterval(shuffleSoundInterval); cards.forEach(c => { new TWEEN.Tween(c.position).to({y:0, x:0}, 300).start(); new TWEEN.Tween(c.rotation).to({z:0}, 300).start(); }); appState = 'READY_TO_SPREAD'; uiStatus.innerHTML = "✨ 洗牌完成！请 <b>张开手掌</b> 铺开牌阵"; progressBar.style.display = 'none'; }
-    function spreadCards() { if (appState !== 'READY_TO_SPREAD') return; appState = 'FANNING'; uiStatus.innerHTML = "🎴 请伸出 <b>食指</b> 抽取卡牌"; playMagicSound('fly'); const totalArc = Math.PI * 0.8; cards.forEach((card, i) => { const angle = (i/22)*totalArc - (totalArc/2); new TWEEN.Tween(card.position).to({x: Math.sin(angle)*5, y: -1, z: Math.cos(angle)*5 - 6}, 1000).easing(TWEEN.Easing.Back.Out).start(); new TWEEN.Tween(card.rotation).to({x: 0, y: Math.PI - angle*0.5, z: 0}, 1000).start(); }); setTimeout(() => { appState = 'WAITING_FOR_PICK'; }, 1000); }
+    function spreadCards() { 
+        if (appState !== 'READY_TO_SPREAD') return; 
+        appState = 'FANNING'; 
+        uiStatus.innerHTML = "🎴 请伸出 <b>食指</b> 抽取卡牌"; 
+        playMagicSound('fly'); 
+        
+        // 根据屏幕宽度调整扇形参数
+        const isMobile = window.innerWidth < 768;
+        const totalArc = isMobile ? Math.PI * 0.5 : Math.PI * 0.8;  // 手机减小角度
+        const spreadDistance = isMobile ? 3.5 : 5;  // 手机减小距离
+        
+        cards.forEach((card, i) => { 
+            const angle = (i/22)*totalArc - (totalArc/2); 
+            new TWEEN.Tween(card.position).to({x: Math.sin(angle)*spreadDistance, y: -1, z: Math.cos(angle)*spreadDistance - 6}, 1000).easing(TWEEN.Easing.Back.Out).start(); 
+            new TWEEN.Tween(card.rotation).to({x: 0, y: Math.PI - angle*0.5, z: 0}, 1000).start(); 
+        }); 
+        setTimeout(() => { appState = 'WAITING_FOR_PICK'; }, 1000); 
+    }
 
     function pickCard() {
         if (appState !== 'WAITING_FOR_PICK' || drawnCount >= 3) return; appState = 'PICKING'; playMagicSound('fly');

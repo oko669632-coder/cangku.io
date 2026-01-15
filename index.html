@@ -1214,7 +1214,21 @@
     }
 
     let appState = 'WAITING_FOR_CLICK'; let drawnCount = 0; const selectedCardsData = [];
-    const SLOTS = [{x:-4, label:"过去"}, {x:0, label:"现在"}, {x:4, label:"未来"}];
+    
+    // 根据屏幕宽度自适应SLOTS的位置
+    const getSlots = () => {
+        const isMobile = window.innerWidth < 768;
+        const isSmallMobile = window.innerWidth < 480;
+        if (isSmallMobile) {
+            return [{x:-2.5, label:"过去"}, {x:0, label:"现在"}, {x:2.5, label:"未来"}];
+        } else if (isMobile) {
+            return [{x:-3, label:"过去"}, {x:0, label:"现在"}, {x:3, label:"未来"}];
+        } else {
+            return [{x:-4, label:"过去"}, {x:0, label:"现在"}, {x:4, label:"未来"}];
+        }
+    };
+    
+    let SLOTS = getSlots();
     const uiStatus = document.getElementById('status'); const progressBar = document.getElementById('progress-bar'); const cameraDiv = document.getElementById('camera-container'); const uiLayer = document.getElementById('ui-layer');
 
     startBtn.addEventListener('click', () => {
@@ -1332,6 +1346,7 @@
         camera.updateProjectionMatrix(); 
         renderer.setSize(innerWidth, innerHeight);
         updateCameraPosition();
+        SLOTS = getSlots();  // 更新SLOTS位置
     };
 </script>
 </body>

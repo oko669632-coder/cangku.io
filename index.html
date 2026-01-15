@@ -2,17 +2,16 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <title>命运之轮 - 沉浸式手势塔罗</title>
+    <title>命运之轮 - 真实塔罗仪式</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { 
             margin: 0; overflow: hidden; 
             background: radial-gradient(circle at center, #1a0b2e 0%, #000000 90%); 
             font-family: 'Cinzel', serif; 
-            color: #d4af37; /* 金色 */
+            color: #d4af37; 
         }
 
-        /* 摄像头画中画 - 加上金色边框 */
         #camera-container {
             position: absolute; top: 20px; left: 20px;
             width: 160px; height: 120px; z-index: 10;
@@ -20,39 +19,43 @@
             box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
             border-radius: 4px; overflow: hidden;
             transform: scaleX(-1); opacity: 0.8;
-            transition: opacity 0.5s;
         }
         video { width: 100%; height: 100%; object-fit: cover; filter: sepia(0.5) contrast(1.2); }
 
-        /* 顶部标题 */
         #header {
             position: absolute; top: 20px; width: 100%; text-align: center;
             pointer-events: none; z-index: 5;
         }
         h1 { margin: 0; font-size: 32px; letter-spacing: 5px; text-shadow: 0 0 20px #d4af37; }
 
-        /* 底部状态栏 */
         #ui-layer {
             position: absolute; bottom: 30px; width: 100%; text-align: center;
             pointer-events: none; z-index: 5;
         }
         #status { 
             font-size: 20px; letter-spacing: 2px;
-            background: rgba(0,0,0,0.6); padding: 10px 30px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            display: inline-block; border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.8); padding: 15px 40px;
+            border: 1px solid #d4af37;
+            display: inline-block; border-radius: 30px;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+            transition: all 0.3s;
         }
 
-        /* 阵法位置标签 (过去/现在/未来) */
-        .slot-label {
-            position: absolute; top: 65%; transform: translateX(-50%);
-            font-size: 18px; color: #fff; opacity: 0;
-            text-shadow: 0 0 10px #d4af37;
-            transition: opacity 1s, top 1s;
+        .card-name {
+            position: absolute; bottom: 180px; left: 50%; transform: translateX(-50%);
+            font-size: 24px; color: #fff; text-shadow: 0 0 10px #d4af37;
+            opacity: 0; transition: opacity 1s; pointer-events: none;
+            text-align: center; width: 300px;
         }
-        /* 动态生成三个标签的位置 */
+        
+        /* 进度条 (洗牌用) */
+        #progress-bar {
+            width: 0%; height: 4px; background: #d4af37; 
+            margin-top: 10px; border-radius: 2px; transition: width 0.1s;
+            display: none;
+        }
     </style>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
@@ -61,77 +64,60 @@
 <body>
 
     <div id="header"><h1>TAROT OF FATE</h1></div>
+    <div id="camera-container"><video id="input_video"></video></div>
 
-    <div id="camera-container">
-        <video id="input_video"></video>
-    </div>
+    <div id="card-name-0" class="card-name"></div>
+    <div id="card-name-1" class="card-name"></div>
+    <div id="card-name-2" class="card-name"></div>
 
-    <div id="labels-container"></div> <div id="ui-layer">
-        <div id="status">✨ 正在连接灵性通道 (启动摄像头)...</div>
+    <div id="ui-layer">
+        <div id="status">正在准备灵性连接...</div>
+        <div style="width: 300px; margin: 0 auto;"><div id="progress-bar"></div></div>
     </div>
 
 <script>
-    // --- 0. 音效合成器 (Web Audio API) ---
-    // 为了不依赖外部mp3文件，我们用代码生成"魔法"音效
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // --- 1. 塔罗牌数据中心 (使用 GitHub Raw 资源) ---
+    // 包含了 22 张大阿卡纳牌的文件名映射
+    const TAROT_DATA = [
+        { name: "0. The Fool (愚者)", file: "m00.jpg" },
+        { name: "I. The Magician (魔术师)", file: "m01.jpg" },
+        { name: "II. The High Priestess (女祭司)", file: "m02.jpg" },
+        { name: "III. The Empress (皇后)", file: "m03.jpg" },
+        { name: "IV. The Emperor (皇帝)", file: "m04.jpg" },
+        { name: "V. The Hierophant (教皇)", file: "m05.jpg" },
+        { name: "VI. The Lovers (恋人)", file: "m06.jpg" },
+        { name: "VII. The Chariot (战车)", file: "m07.jpg" },
+        { name: "VIII. Strength (力量)", file: "m08.jpg" },
+        { name: "IX. The Hermit (隐士)", file: "m09.jpg" },
+        { name: "X. Wheel of Fortune (命运之轮)", file: "m10.jpg" },
+        { name: "XI. Justice (正义)", file: "m11.jpg" },
+        { name: "XII. The Hanged Man (倒吊人)", file: "m12.jpg" },
+        { name: "XIII. Death (死神)", file: "m13.jpg" },
+        { name: "XIV. Temperance (节制)", file: "m14.jpg" },
+        { name: "XV. The Devil (恶魔)", file: "m15.jpg" },
+        { name: "XVI. The Tower (高塔)", file: "m16.jpg" },
+        { name: "XVII. The Star (星星)", file: "m17.jpg" },
+        { name: "XVIII. The Moon (月亮)", file: "m18.jpg" },
+        { name: "XIX. The Sun (太阳)", file: "m19.jpg" },
+        { name: "XX. Judgement (审判)", file: "m20.jpg" },
+        { name: "XXI. The World (世界)", file: "m21.jpg" }
+    ];
+
+    // 图片加载器
+    const textureLoader = new THREE.TextureLoader();
+    const baseUrl = "https://raw.githubusercontent.com/rand7/tarot-images/master/cards/";
     
-    function playMagicSound(type) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const osc = audioCtx.createOscillator();
-        const gainNode = audioCtx.createGain();
-        const filter = audioCtx.createBiquadFilter();
+    // 预加载所有纹理，防止翻牌时黑屏
+    TAROT_DATA.forEach(card => {
+        textureLoader.load(baseUrl + card.file);
+    });
 
-        osc.connect(filter);
-        filter.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-
-        const now = audioCtx.currentTime;
-
-        if (type === 'hover') {
-            // 选牌: 高频风铃声
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(800, now);
-            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-            gainNode.gain.setValueAtTime(0.1, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-            osc.start(now);
-            osc.stop(now + 0.5);
-        } else if (type === 'select') {
-            // 确认抽取: 神秘的闪烁声
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(400, now);
-            osc.frequency.linearRampToValueAtTime(880, now + 0.3);
-            gainNode.gain.setValueAtTime(0.2, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-            
-            // 增加回声感
-            filter.type = "lowpass";
-            filter.frequency.value = 2000;
-            
-            osc.start(now);
-            osc.stop(now + 1.5);
-        } else if (type === 'flip') {
-            // 翻牌: 空气划过的声音 (模拟白噪音)
-            // 简单模拟: 低频滑音
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(100, now);
-            osc.frequency.exponentialRampToValueAtTime(10, now + 0.5);
-            gainNode.gain.setValueAtTime(0.3, now);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-            filter.type = "lowpass";
-            filter.frequency.setValueAtTime(500, now);
-            filter.frequency.linearRampToValueAtTime(100, now + 0.5);
-            osc.start(now);
-            osc.stop(now + 0.5);
-        }
-    }
-
-    // --- 1. Three.js 初始化 ---
+    // --- 2. 基础 Three.js 场景 ---
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x1a0b2e, 0.04); // 紫色迷雾
+    scene.fog = new THREE.FogExp2(0x1a0b2e, 0.03);
 
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 4, 11);
+    camera.position.set(0, 5, 12);
     camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -139,366 +125,52 @@
     renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
 
-    // 灯光系统
-    const ambLight = new THREE.AmbientLight(0x404040, 1.5);
-    scene.add(ambLight);
-    
-    // 主光源：金色聚光灯
-    const spotLight = new THREE.SpotLight(0xffeebb, 1);
-    spotLight.position.set(0, 20, 10);
-    spotLight.angle = Math.PI / 4;
-    spotLight.penumbra = 0.5;
+    const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
+    scene.add(ambientLight);
+    const spotLight = new THREE.SpotLight(0xffd700, 1.2);
+    spotLight.position.set(0, 15, 5);
     spotLight.castShadow = true;
     scene.add(spotLight);
 
-    // 紫色背光，增加神秘感
-    const purpleLight = new THREE.PointLight(0x8a2be2, 1, 20);
-    purpleLight.position.set(0, 2, -5);
-    scene.add(purpleLight);
-
-    // --- 2. 材质生成器 (程序化纹理) ---
-    function createCardTexture(type) {
+    // --- 3. 材质与模型 ---
+    // 创建卡背纹理 (程序化生成)
+    function createBackTexture() {
         const canvas = document.createElement('canvas');
         canvas.width = 256; canvas.height = 512;
         const ctx = canvas.getContext('2d');
+        const grd = ctx.createRadialGradient(128, 256, 10, 128, 256, 256);
+        grd.addColorStop(0, "#5e2a84"); grd.addColorStop(1, "#1a0b2e");
+        ctx.fillStyle = grd; ctx.fillRect(0,0,256,512);
         
-        // 背景
-        const grd = ctx.createRadialGradient(128, 256, 20, 128, 256, 256);
-        if(type === 'back') {
-            grd.addColorStop(0, "#4b0082"); // 深紫
-            grd.addColorStop(1, "#1a0b2e"); // 近黑
-        } else {
-            grd.addColorStop(0, "#fff8dc"); // 奶油色
-            grd.addColorStop(1, "#deb887"); // 羊皮纸色
-        }
-        ctx.fillStyle = grd;
-        ctx.fillRect(0,0,256,512);
-
-        // 金边
-        ctx.strokeStyle = "#d4af37";
-        ctx.lineWidth = 10;
-        ctx.strokeRect(5,5,246,502);
+        ctx.strokeStyle = "#d4af37"; ctx.lineWidth = 15; ctx.strokeRect(10,10,236,492);
+        ctx.beginPath(); ctx.arc(128, 256, 70, 0, Math.PI*2); ctx.stroke();
         
-        // 花纹
-        ctx.strokeStyle = "rgba(212, 175, 55, 0.3)";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        for(let i=0; i<512; i+=20) { ctx.moveTo(0,i); ctx.lineTo(256,i+128); }
-        ctx.stroke();
-
-        if(type === 'back') {
-            // 背面：画一个圆圈/五角星
-            ctx.beginPath();
-            ctx.arc(128, 256, 60, 0, 2 * Math.PI);
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = "#d4af37";
-            ctx.stroke();
-            // 文字
-            ctx.fillStyle = "#d4af37";
-            ctx.font = "30px serif";
-            ctx.textAlign = "center";
-            ctx.fillText("FATE", 128, 265);
-        } else {
-            // 正面：随机图案（这里只画个大概表示）
-            ctx.fillStyle = "#800000";
-            ctx.font = "40px serif";
-            ctx.textAlign = "center";
-            ctx.fillText("TAROT", 128, 100);
-            // 简单的随机图形
-            ctx.beginPath();
-            ctx.arc(128, 256, 80, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(0,0,0,0.1)";
-            ctx.fill();
-        }
-
+        ctx.fillStyle = "#d4af37"; ctx.font = "40px serif"; 
+        ctx.textAlign = "center"; ctx.fillText("FATE", 128, 270);
         return new THREE.CanvasTexture(canvas);
     }
+    const backTexture = createBackTexture();
+    const sideMaterial = new THREE.MeshStandardMaterial({ color: 0x111111 });
+    const backMaterial = new THREE.MeshStandardMaterial({ map: backTexture });
 
-    // --- 3. 场景对象创建 ---
     const cards = [];
-    const particles = [];
-    const TOTAL_CARDS = 22; 
-    const cardGeometry = new THREE.BoxGeometry(1.5, 2.5, 0.02);
-    const cardBackTex = createCardTexture('back');
-    
-    // 阵法槽位坐标 (过去:左, 现在:中, 未来:右)
-    const SLOTS = [
-        { x: -3.5, y: 1.5, z: 2, label: "THE PAST · 过去" },
-        { x: 0,    y: 1.5, z: 2, label: "THE PRESENT · 现在" },
-        { x: 3.5,  y: 1.5, z: 2, label: "THE FUTURE · 未来" }
-    ];
+    const deckGroup = new THREE.Group();
+    scene.add(deckGroup);
 
-    // 初始化HTML标签位置 (DOM)
-    function initLabels() {
-        const container = document.getElementById('labels-container');
-        SLOTS.forEach((slot, i) => {
-            const div = document.createElement('div');
-            div.className = 'slot-label';
-            div.innerText = slot.label;
-            div.id = `label-${i}`;
-            // 简单的2D位置映射，这里先居中隐藏，等选中后显示
-            div.style.left = '50%';
-            div.style.top = '60%';
-            container.appendChild(div);
-        });
-    }
-    initLabels();
-
-    // 创建卡牌
-    for (let i = 0; i < TOTAL_CARDS; i++) {
-        // 每张牌正面略微不同（随机生成一个纹理）
-        const frontTex = createCardTexture('front'); 
+    // 初始化 22 张物理卡牌 (初始都是背面)
+    for (let i = 0; i < 22; i++) {
+        // 初始正面我们给一个“未知”的材质，翻牌时再替换为真实图片
+        const tempFrontMat = new THREE.MeshStandardMaterial({ color: 0x000000 });
+        const materials = [sideMaterial, sideMaterial, sideMaterial, sideMaterial, tempFrontMat, backMaterial];
+        const geometry = new THREE.BoxGeometry(1.5, 2.6, 0.02);
+        const card = new THREE.Mesh(geometry, materials);
         
-        const materials = [
-            new THREE.MeshStandardMaterial({ color: 0x111111 }), // 侧边
-            new THREE.MeshStandardMaterial({ color: 0x111111 }),
-            new THREE.MeshStandardMaterial({ color: 0x111111 }),
-            new THREE.MeshStandardMaterial({ color: 0x111111 }),
-            new THREE.MeshStandardMaterial({ map: frontTex }),   // 正面
-            new THREE.MeshStandardMaterial({ map: cardBackTex }) // 背面
-        ];
-        
-        const card = new THREE.Mesh(cardGeometry, materials);
-        card.position.set(0, -2, -i * 0.05); // 初始在屏幕下方堆叠
-        card.rotation.set(-Math.PI / 2, 0, Math.random() * 0.2 - 0.1);
+        // 初始堆叠位置
+        card.position.set(0, 0, -i * 0.02);
+        card.rotation.x = -Math.PI / 2;
         card.castShadow = true;
-        card.receiveShadow = true;
         
-        card.userData = { id: i, isSelected: false };
+        card.userData = { id: i, isSelected: false, textureLoaded: false };
         cards.push(card);
-        scene.add(card);
+        deckGroup.add(card);
     }
-
-    // --- 4. 粒子系统 (魔法光尘) ---
-    // 创建一个全局的粒子系统，而不是每张卡牌一个
-    const particleGeo = new THREE.BufferGeometry();
-    const particleCount = 300;
-    const pPos = new Float32Array(particleCount * 3);
-    const pVel = [];
-    
-    for(let i=0; i<particleCount; i++){
-        pPos[i*3] = (Math.random() - 0.5) * 20;
-        pPos[i*3+1] = (Math.random() - 0.5) * 10;
-        pPos[i*3+2] = (Math.random() - 0.5) * 10;
-        pVel.push({
-            x: (Math.random()-0.5)*0.02, 
-            y: (Math.random()-0.5)*0.02 + 0.02, // 向上漂浮
-            z: (Math.random()-0.5)*0.02 
-        });
-    }
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    const particleMat = new THREE.PointsMaterial({
-        color: 0xffd700, size: 0.1, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending
-    });
-    const magicDust = new THREE.Points(particleGeo, particleMat);
-    scene.add(magicDust);
-
-
-    // --- 5. 交互逻辑 & 状态机 ---
-    let appState = 'IDLE'; 
-    let drawnCount = 0;
-    const selectedCardsData = []; // 存储选中的牌和对应的槽位索引
-    const uiStatus = document.getElementById('status');
-
-    // 状态更新 UI 辅助函数
-    function updateLabelPos(index) {
-        // 将3D坐标投射到2D屏幕
-        const slot = SLOTS[index];
-        const vector = new THREE.Vector3(slot.x, slot.y - 1.5, slot.z); // 文字在卡牌下方
-        vector.project(camera);
-        
-        const x = (vector.x * .5 + .5) * window.innerWidth;
-        const y = (-(vector.y * .5) + .5) * window.innerHeight;
-
-        const el = document.getElementById(`label-${index}`);
-        el.style.left = `${x}px`;
-        el.style.top = `${y}px`;
-        el.style.opacity = 1;
-    }
-
-    function spreadCards() {
-        if (appState !== 'IDLE' && appState !== 'FIST_DETECTED') return;
-        appState = 'FANNING';
-        uiStatus.innerHTML = "🎴 牌阵已展开，请伸出<b>食指</b>感应你的卡牌";
-        playMagicSound('select'); // 播放展开音效
-
-        const totalArc = Math.PI * 0.8;
-        const radius = 5;
-        
-        cards.forEach((card, index) => {
-            const angle = (index / TOTAL_CARDS) * totalArc - (totalArc / 2);
-            // 扇形位置
-            const tx = Math.sin(angle) * radius;
-            const ty = -1; // 屏幕下方
-            const tz = Math.cos(angle) * radius - 5; 
-            
-            new TWEEN.Tween(card.position).to({ x: tx, y: ty, z: tz }, 1200)
-                .easing(TWEEN.Easing.Quadratic.Out).start();
-            
-            new TWEEN.Tween(card.rotation).to({ x: -0.5, y: -angle, z: 0 }, 1200)
-                .start()
-                .onComplete(() => {
-                    if(index === cards.length -1) appState = 'WAITING_FOR_PICK';
-                });
-        });
-    }
-
-    function pickCard() {
-        if (appState !== 'WAITING_FOR_PICK' || drawnCount >= 3) return;
-        
-        // 简单的防抖：确保上次动画稍微完成一点
-        appState = 'PICKING'; 
-        
-        const available = cards.filter(c => !c.userData.isSelected);
-        if (available.length === 0) return;
-        
-        const card = available[Math.floor(Math.random() * available.length)];
-        card.userData.isSelected = true;
-        
-        // 获取当前对应的槽位（过去->现在->未来）
-        const slot = SLOTS[drawnCount];
-        selectedCardsData.push({ mesh: card, slotIndex: drawnCount });
-        
-        playMagicSound('select'); // 播放选中音效
-
-        // 动画：飞向槽位
-        new TWEEN.Tween(card.position)
-            .to({ x: slot.x, y: slot.y, z: slot.z }, 1500)
-            .easing(TWEEN.Easing.Cubic.Out)
-            .start();
-
-        new TWEEN.Tween(card.rotation)
-            .to({ x: 0, y: 0, z: 0 }, 1500) // 竖直，依然是背面
-            .start();
-        
-        // 放大一点
-        new TWEEN.Tween(card.scale)
-            .to({ x: 1.1, y: 1.1, z: 1.1 }, 1000)
-            .onComplete(() => {
-                // 显示该位置的文字标签
-                updateLabelPos(drawnCount);
-                
-                drawnCount++;
-                if (drawnCount < 3) {
-                    appState = 'WAITING_FOR_PICK';
-                    const nextText = drawnCount === 1 ? "现在" : "未来";
-                    uiStatus.innerHTML = `🔮 已选定[${SLOTS[drawnCount-1].label.split('·')[1].trim()}]，请继续抽取 <b>${nextText}</b> 之牌`;
-                } else {
-                    appState = 'REVEALING';
-                    uiStatus.innerHTML = "✨ 命运之轮已定，准备揭晓...";
-                    setTimeout(revealAll, 1000);
-                }
-            })
-            .start();
-    }
-
-    function revealAll() {
-        selectedCardsData.forEach((item, i) => {
-            setTimeout(() => {
-                playMagicSound('flip'); // 翻牌音效
-                new TWEEN.Tween(item.mesh.rotation)
-                    .to({ y: Math.PI }, 1200) // 翻转
-                    .easing(TWEEN.Easing.Back.Out)
-                    .start();
-            }, i * 500); // 依次翻开
-        });
-        uiStatus.innerHTML = "🌟 牌阵已成。请聆听启示。";
-        appState = 'FINISHED';
-    }
-
-
-    // --- 6. 视觉手势识别 ---
-    // (逻辑与上一版类似，增加了状态反馈)
-    const videoEl = document.getElementById('input_video');
-    
-    function onResults(results) {
-        if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) return;
-        const lm = results.multiHandLandmarks[0];
-
-        // 简易判断：食指是否伸出 (Index Tip y < Index Pip y)
-        const isIndexOpen = lm[8].y < lm[6].y; 
-        const isMiddleOpen = lm[12].y < lm[10].y;
-        const isRingOpen = lm[16].y < lm[14].y;
-        const isPinkyOpen = lm[20].y < lm[18].y;
-
-        const isFist = !isIndexOpen && !isMiddleOpen && !isRingOpen && !isPinkyOpen;
-        const isPalm = isIndexOpen && isMiddleOpen && isRingOpen && isPinkyOpen;
-        const isPoint = isIndexOpen && !isMiddleOpen && !isRingOpen && !isPinkyOpen;
-
-        if (appState === 'IDLE') {
-            if(isFist) {
-                uiStatus.innerHTML = "✊ 已感应能量（拳头），请<b>张开手掌</b>释放牌阵";
-                appState = 'FIST_DETECTED';
-            } else {
-                uiStatus.innerHTML = "请对着镜头握紧<b>拳头</b>以开始仪式";
-            }
-        } 
-        else if (appState === 'FIST_DETECTED' && isPalm) {
-            spreadCards();
-        }
-        else if (appState === 'WAITING_FOR_PICK') {
-            if(isPoint) {
-                // 加个即时音效反馈？不，太频繁了，只在pickCard里播放
-                pickCard();
-            }
-        }
-    }
-
-    const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-    hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
-    hands.onResults(onResults);
-
-    const cameraUtils = new Camera(videoEl, {
-        onFrame: async () => { await hands.send({image: videoEl}); },
-        width: 320, height: 240
-    });
-    cameraUtils.start();
-
-
-    // --- 7. 渲染循环 ---
-    const clock = new THREE.Clock();
-    
-    function animate() {
-        requestAnimationFrame(animate);
-        const delta = clock.getDelta();
-        const time = clock.getElapsedTime();
-
-        TWEEN.update();
-
-        // 1. 卡牌悬浮呼吸效果 (Waiting 状态)
-        if(appState === 'WAITING_FOR_PICK') {
-            cards.forEach((c, i) => {
-                if(!c.userData.isSelected) {
-                    c.position.y += Math.sin(time * 2 + i) * 0.002;
-                }
-            });
-        }
-
-        // 2. 粒子背景漂浮
-        const positions = magicDust.geometry.attributes.position.array;
-        for(let i=0; i<particleCount; i++){
-            positions[i*3+1] += pVel[i].y; 
-            // 循环复位
-            if(positions[i*3+1] > 10) positions[i*3+1] = -10;
-        }
-        magicDust.geometry.attributes.position.needsUpdate = true;
-        magicDust.rotation.y = time * 0.05; // 整体缓慢旋转
-
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    // 窗口调整
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        // 重新计算标签位置
-        if(drawnCount > 0) {
-           for(let i=0; i<drawnCount; i++) updateLabelPos(i);
-        }
-    });
-
-</script>
-</body>
-</html>

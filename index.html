@@ -2,6 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>命运之轮 - 防卡死稳定版</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -200,6 +201,229 @@
         }
         #start-btn:hover { background: #d4af37; color: #000; box-shadow: 0 0 40px rgba(212, 175, 55, 0.6); }
         #loading-text { font-size: 18px; color: #ccc; margin-bottom: 10px; }
+
+        /* ===== 手机适配 ===== */
+        @media (max-width: 768px) {
+            h1 { font-size: 24px; letter-spacing: 3px; }
+            
+            #camera-container {
+                width: 120px; height: 90px; top: 10px; left: 10px;
+                border-width: 2px;
+            }
+            
+            #labels-container {
+                bottom: 100px; gap: 10px;
+            }
+            
+            .card-label-box {
+                width: 30%; max-width: 150px; min-width: 100px;
+            }
+            
+            .card-name {
+                font-size: 12px; padding: 8px;
+            }
+            
+            .slot-title { 
+                font-size: 11px; margin-bottom: 3px;
+            }
+            
+            #status { 
+                font-size: 14px; padding: 10px 20px;
+            }
+            
+            #progress-bar { height: 3px; }
+            
+            #settings-panel {
+                min-width: 85vw; max-width: 95vw;
+                padding: 20px; margin: 10px;
+                border-radius: 6px;
+                max-height: 80vh;
+            }
+            
+            .settings-title {
+                font-size: 18px;
+            }
+            
+            .settings-label {
+                font-size: 13px;
+            }
+            
+            .settings-input {
+                font-size: 12px; padding: 6px;
+            }
+            
+            .settings-btn {
+                padding: 10px; font-size: 13px;
+            }
+            
+            #reading-panel {
+                padding: 20px;
+            }
+            
+            .reading-content {
+                padding: 20px; max-width: 95vw;
+                border-radius: 6px;
+            }
+            
+            .reading-card-name {
+                font-size: 20px; margin-bottom: 15px;
+            }
+            
+            .reading-text {
+                font-size: 14px; max-height: 300px; margin-bottom: 15px;
+            }
+            
+            .reading-btn {
+                padding: 8px 20px; font-size: 13px;
+            }
+            
+            #reading-choice-panel {
+                padding: 20px;
+            }
+            
+            .choice-content {
+                padding: 30px 20px; max-width: 95vw;
+                border-radius: 6px;
+            }
+            
+            .choice-title {
+                font-size: 24px; margin-bottom: 20px;
+            }
+            
+            .choice-subtitle {
+                font-size: 14px; margin-bottom: 30px;
+            }
+            
+            .choice-btn {
+                padding: 15px; font-size: 16px;
+            }
+            
+            .choice-btn-icon {
+                font-size: 20px;
+            }
+            
+            .choice-btn-text {
+                font-size: 12px; margin-top: 3px;
+            }
+            
+            #start-btn {
+                padding: 15px 40px; font-size: 18px;
+            }
+            
+            #loading-text { font-size: 14px; }
+        }
+        
+        @media (max-width: 480px) {
+            h1 { font-size: 18px; letter-spacing: 2px; }
+            
+            #camera-container {
+                width: 100px; height: 75px; top: 8px; left: 8px;
+                border-width: 2px;
+            }
+            
+            #labels-container {
+                bottom: 90px; gap: 8px;
+            }
+            
+            .card-label-box {
+                width: 28%; max-width: 110px; min-width: 80px;
+            }
+            
+            .card-name {
+                font-size: 11px; padding: 6px;
+            }
+            
+            .slot-title { 
+                font-size: 10px; margin-bottom: 2px;
+            }
+            
+            #status { 
+                font-size: 12px; padding: 8px 15px;
+            }
+            
+            #settings-panel {
+                min-width: 90vw; max-width: 98vw;
+                padding: 15px;
+                max-height: 85vh;
+            }
+            
+            .settings-title {
+                font-size: 16px; margin-bottom: 15px;
+            }
+            
+            .settings-group {
+                margin-bottom: 12px;
+            }
+            
+            .settings-label {
+                font-size: 12px;
+            }
+            
+            .settings-input {
+                font-size: 11px; padding: 5px;
+            }
+            
+            .settings-btn {
+                padding: 8px; font-size: 12px; margin-top: 6px;
+            }
+            
+            #reading-panel {
+                padding: 15px;
+            }
+            
+            .reading-content {
+                padding: 15px;
+            }
+            
+            .reading-card-name {
+                font-size: 18px; margin-bottom: 12px;
+            }
+            
+            .reading-text {
+                font-size: 13px; max-height: 250px; margin-bottom: 12px;
+                line-height: 1.6;
+            }
+            
+            .reading-controls {
+                gap: 8px;
+            }
+            
+            .reading-btn {
+                padding: 8px 15px; font-size: 12px;
+            }
+            
+            .choice-content {
+                padding: 25px 15px;
+            }
+            
+            .choice-title {
+                font-size: 20px; margin-bottom: 15px;
+            }
+            
+            .choice-subtitle {
+                font-size: 13px; margin-bottom: 20px;
+            }
+            
+            .choice-buttons {
+                gap: 10px;
+            }
+            
+            .choice-btn {
+                padding: 12px; font-size: 14px;
+            }
+            
+            .choice-btn-icon {
+                font-size: 18px; margin-right: 8px;
+            }
+            
+            .choice-btn-text {
+                font-size: 11px;
+            }
+            
+            #start-btn {
+                padding: 12px 30px; font-size: 16px;
+            }
+        }
     </style>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -479,38 +703,34 @@
         }
     };
 
-    // ===== 加载txt补充库 =====
-    let supplementaryReadings = {};
+    // ===== 加载txt补充库（嵌入式数据）=====
+    const supplementaryReadings = {
+        '0. The Fool (愚者)': '在心理学角度看，愚者代表了人类的原始冲动和对自由的渴望。这张牌提醒我们，有时候真正的智慧来自于敢于放下理性的束缚，去追随内心的声音。每一段新的开始都需要一些"愚蠢"的勇气。',
+        'I. The Magician (魔术师)': '魔术师的真正力量不是来自外部，而是来自于对自身能力的深刻认知和信心。他教会我们，每个人都是自己人生的创造者，只要我们学会整合和运用手中的资源。这需要专注、纪律和持续的练习。',
+        'II. The High Priestess (女祭司)': '在信息爆炸的时代，女祭司提醒我们要学会静心和观察。真正的知识往往隐藏在表面之下，需要我们的直觉和耐心去发现。她代表了阴性能量的智慧——被动的接纳、深层的理解、神秘的力量。',
+        'III. The Empress (皇后)': '皇后不仅代表母性，更代表了自我价值的肯定和丰盛意识的建立。她告诉我们，真正的力量来自于自我爱护和自我欣赏。当我们懂得照顾自己时，我们才能真正地去关爱和滋养他人。丰盛始于内在的满足。',
+        'IV. The Emperor (皇帝)': '皇帝代表了结构化思维和纪律的力量。在现代社会，皇帝的能量特别重要——它提醒我们需要有清晰的目标、坚定的计划和果敢的行动。但同时，过度的控制欲可能导致压制和僵化，智慧的皇帝知道何时放松掌控。',
+        'V. The Hierophant (教皇)': '教皇是传统和智慧的守护者，但这不意味着固步自封。现代的教皇能量是关于建立有意义的框架和价值体系，无论是宗教的、伦理的还是个人的。他邀请我们在尊重传统的同时，寻找适合当代的表达方式。',
+        'VI. The Lovers (恋人)': '恋人牌不仅关于浪漫的爱情，更关乎选择、承诺和价值观的同频。这张牌提醒我们，最深刻的联系来自于真实的对话和相互的理解。它也代表了内在的一致性——当我们的思想、言语和行动保持一致时，我们才能真正地去爱和被爱。',
+        'VII. The Chariot (战车)': '战车是意志力和决心的象征。但真正的胜利不仅需要驾驭，更需要方向和平衡。两匹马必须协调一致才能前进。这教会我们，成功需要整合我们的各种能力和冲动，而不是压制它们。前进的力量来自于内部的和谐。',
+        'VIII. Strength (力量)': '真正的力量不在于肌肉或蛮力，而在于对自我的深刻理解和温柔的力量。图像中的女人用温柔去驯服狮子，这象征了通过同情和耐心去整合我们内心的野性能量。这是一种需要更多勇气的力量——既不压制也不纵容。',
+        'IX. The Hermit (隐士)': '在现代的快节奏生活中，隐士能量变得更加珍贵。这张牌邀请我们定期退出社交漩涡，进行深度的自我反思。隐士的灯笼不仅照亮了他自己的路，也为他人指引方向。内在的光来自于对自我的深刻了解。',
+        'X. Wheel of Fortune (命运之轮)': '命运之轮提醒我们，生命是循环的。没有永恒的上升或下降，只有不断的转变。这张牌给予我们希望和谦卑——希望在困难时期，谦卑在顺利时期。关键是学会顺应变化，而不是抗拒它。',
+        'XI. Justice (正义)': '正义牌是因果法则的体现。它提醒我们每个行动都有相应的后果，无论这个后果何时到来。在现代社会中，正义能量也代表了公平性、透明度和诚实的沟通。它要求我们对自己的选择负责，同时也给予我们对公正的信心。',
+        'XII. The Hanged Man (倒吊人)': '倒吊人是最被误解的卡牌。他不是受害者，而是通过自愿的暂停和不同的视角来获得智慧的人。这张牌在现代生活中提醒我们，有时候停止前进比继续前进更需要勇气。变换视角往往比改变环境更有力量。',
+        'XIII. Death (死神)': '死神是最强大的转变力量。虽然名字令人恐惧，但这张牌代表的是自然的蜕变——冬天之后是春天，结束之后是新生。在现代语境中，它可以代表职业的转变、关系的结束或自我认知的死亡与重生。拥抱它意味着相信生命的永恒循环。',
+        'XIV. Temperance (节制)': '节制不是禁欲，而是平衡和融合。这张牌教会我们如何将相对的力量调和在一起，创造出和谐的生活。它在现代社会中特别重要——教会我们在工作和生活、理性和感性、给予和接收之间找到平衡点。',
+        'XV. The Devil (恶魔)': '恶魔牌通常代表我们对自己的束缚和限制信念。但这个"恶魔"的真正力量在于——它是我们自己创造的。这意味着我们也有力量去解放自己。恶魔邀请我们面对我们的恐惧、欲望和自我欺骗，从而获得真正的自由。',
+        'XVI. The Tower (高塔)': '高塔是突然的启蒙。虽然这个过程往往是痛苦的，但它带来的清晰是无价的。这张牌在生活中出现时，意味着虚假的基础正在坍塌，为真实的重建铺平道路。从混乱中诞生的新秩序往往更加坚固。',
+        'XVII. The Star (星星)': '星星是希望的具体化。在黑暗中，一颗星足以指引我们前行。这张牌鼓励我们追随我们的真实梦想，而不是社会的期望。星星也代表了灵性的连接和与更大的宇宙力量的对齐。它提醒我们，我们的梦想是值得的。',
+        'XVIII. The Moon (月亮)': '月亮代表了心灵和潜意识的领域。在月光下，真实和幻觉的界限变得模糊。这张牌邀请我们相信我们的直觉，同时也要警惕自我欺骗。梦境、直觉和创意在月亮的能量中蓬勃发展，但我们也需要学会区分恐惧和真实的警告。',
+        'XIX. The Sun (太阳)': '太阳是最积极的能量。它代表了明确的成功、清晰的道路和无条件的喜悦。在生活中获得太阳牌意味着一个光明的时期到来。这是实现、幸福和生命力的时刻。太阳也提醒我们，即使在最黑暗的时刻，光线也总是会回来的。',
+        'XX. Judgement (审判)': '审判不是关于被评判，而是关于听到内在的呼唤并做出回应。这张牌代表了重要的转折点——一个清晰的"是"或"否"的决定时刻。它也代表了对过去的评估和对新章节的承诺。审判牌出现时，通常意味着我们正在被邀请进入一个更高的意识层次。',
+        'XXI. The World (世界)': '世界牌是圆满和完成。它不是结束，而是一个周期的完成，为新周期的开始做准备。这张牌代表了整体性、一体感和通过完成一个章节而获得的智慧。世界也是旅程——塔罗22张牌的旅程——从愚者的无知到世界的完整理解。'
+    };
     
-    async function loadSupplementaryReadings() {
-        try {
-            const response = await fetch('./数据库补充22张卡牌解读.txt');
-            if (!response.ok) {
-                console.warn('未找到补充解读txt文件');
-                return;
-            }
-            const text = await response.text();
-            parseSupplementaryText(text);
-            console.log('✓ 补充解读库已加载');
-        } catch (error) {
-            console.warn('无法加载补充解读:', error.message);
-        }
-    }
-    
-    function parseSupplementaryText(text) {
-        const entries = text.split('---卡牌分隔线---').slice(1); // 跳过开头的说明部分
-        
-        entries.forEach(entry => {
-            const cardMatch = entry.match(/【卡牌】(.+?)\n/);
-            const supplementMatch = entry.match(/【补充解读】\n([\s\S]*?)\n【来源】/);
-            
-            if (cardMatch && supplementMatch) {
-                const cardName = cardMatch[1].trim();
-                const supplement = supplementMatch[1].trim();
-                supplementaryReadings[cardName] = supplement;
-                console.log(`✓ 已加载补充解读: ${cardName}`);
-            }
-        });
+    function loadSupplementaryReadings() {
+        console.log('✓ 补充解读库已加载');
         console.log('📊 补充解读统计:', Object.keys(supplementaryReadings).length, '张卡牌');
     }
 
@@ -948,7 +1168,21 @@
 
     const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x1a0b2e, 0.03);
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 5, 12); camera.lookAt(0, 0, 0);
+    
+    // 根据设备方向调整相机位置
+    function updateCameraPosition() {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+            // 手机竖屏：调整相机距离和高度
+            camera.position.set(0, 3, 10);
+        } else {
+            // 桌面：原始位置
+            camera.position.set(0, 5, 12);
+        }
+        camera.lookAt(0, 0, 0);
+    }
+    updateCameraPosition();
+    
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight); renderer.shadowMap.enabled = true;
     document.body.appendChild(renderer.domElement);
@@ -983,13 +1217,13 @@
     const SLOTS = [{x:-4, label:"过去"}, {x:0, label:"现在"}, {x:4, label:"未来"}];
     const uiStatus = document.getElementById('status'); const progressBar = document.getElementById('progress-bar'); const cameraDiv = document.getElementById('camera-container'); const uiLayer = document.getElementById('ui-layer');
 
-    startBtn.addEventListener('click', async () => {
+    startBtn.addEventListener('click', () => {
         if (audioCtx.state === 'suspended') audioCtx.resume(); playMagicSound('reveal');
         document.getElementById('start-overlay').style.display = 'none';
         cameraDiv.style.opacity = 0.8; uiLayer.style.opacity = 1;
         appState = 'IDLE'; uiStatus.innerHTML = "请对着镜头 <b>握紧拳头</b> 以开始洗牌";
         cameraUtils.start();
-        await loadSupplementaryReadings(); // 加载txt补充库
+        loadSupplementaryReadings(); // 加载补充解读库
         initSettingsPanel();
     });
 
@@ -1076,7 +1310,12 @@
 
     function animate() { requestAnimationFrame(animate); TWEEN.update(); renderer.render(scene, camera); }
     animate();
-    window.onresize = () => { camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); };
+    window.onresize = () => { 
+        camera.aspect = innerWidth / innerHeight; 
+        camera.updateProjectionMatrix(); 
+        renderer.setSize(innerWidth, innerHeight);
+        updateCameraPosition();
+    };
 </script>
 </body>
 </html>
